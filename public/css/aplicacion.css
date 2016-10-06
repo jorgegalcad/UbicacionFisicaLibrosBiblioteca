@@ -1,0 +1,67 @@
+
+.alineacion-copyright
+{
+  text-align: center;
+}
+.tamanio-subfooter
+{
+  height: 150px;
+  width: 100%;
+}
+.div-principal
+{
+  height: 350px;
+}
+.foto-perfil
+{
+  margin-top: 5px;
+  height:50px;
+}
+.perfil
+{
+  width:150px;
+}
+.cerrar-sesion
+{
+  margin-top: 60px;
+}
+.div-centrado
+{
+width:40%;
+margin: 0 auto;
+}
+.logo
+{
+  width:155px;
+}
+.div-opciones-biblioteca
+{
+  margin-top: 100px;
+  margin-bottom: 100px;
+  width: 20%;
+}
+.div-opciones-codigos
+{
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.titulo-opciones
+{
+  padding-left: 20px;
+}
+.div-plano
+{
+  background-color: #BDBDBD;
+  height: 600px;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+.icon-operacion
+{
+  padding-top: 10px;
+}
+.operacion
+{
+  padding-bottom: 20px;
+}
