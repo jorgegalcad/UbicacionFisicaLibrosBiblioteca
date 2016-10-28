@@ -18,9 +18,13 @@ class CreateCodigoubicadosTable extends Migration
       $table->float('coorX');
       $table->float('coorY');
       $table->integer('id_plano')->unsigned()->nullable();
+      $table->integer('id_codigo')->unsigned()->nullable();
       $table->timestamps();
       $table->foreign('id_plano')
       ->references('id')->on('planos')
+      ->onDelete('cascade');
+      $table->foreign('id_codigo')
+      ->references('id')->on('codigos')
       ->onDelete('cascade');
     });
   }

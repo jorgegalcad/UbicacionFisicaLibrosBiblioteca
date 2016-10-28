@@ -15,7 +15,7 @@ class CreateUsocodigosTable extends Migration
     {
         Schema::create('usocodigos', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nombre','20');
+            $table->string('nombre','60');
             $table->timestamps();
         });
     }

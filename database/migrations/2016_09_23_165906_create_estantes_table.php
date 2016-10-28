@@ -20,7 +20,7 @@ class CreateEstantesTable extends Migration
             $table->float('ancho');
             $table->float('alto');
             $table->float('largo');
-            $table->string('codigo','20');
+            $table->string('codigo');
             $table->integer('id_plano')->unsigned()->nullable();
             $table->timestamps();
             $table->foreign('id_plano')

@@ -17,7 +17,7 @@ class CreateBibliotecasTable extends Migration
       $table->increments('id');
       $table->string('nombre','80');
       $table->string('pais','20');
-      $table->string('departamentto','20');
+      $table->string('departamento','20');
       $table->string('municipio','20');
       $table->string('direccion','30');
       $table->integer('id_user')->unsigned()->nullable();

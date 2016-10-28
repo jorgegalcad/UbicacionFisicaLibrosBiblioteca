@@ -1,5 +1,5 @@
 <?php
-
+//use Image;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,27 +10,28 @@
 | to using a Closure or controller method. Build something great!
 |
 */
-
+Route::group(['middleware'=>['estaAutenticado']],function(){
+///estantes
+Route::get('/estantes','EstantesController@getEstantes');
+Route::post('/estantes','EstantesController@agregarEstante');
 Route::get('/', function () {
-    return view('principal');
+  return view('home.home');
 });
-//Ventana principal sin logueo
-Route::get('/principal',['as'=>'principal',function()
-{
-  return view('principal');
-}]);
-//Ventana de registro
-Route::get('/registro',['as'=>'registro',function()
-{
-  return view('autenticacion.registro');
-}]);
+Route::put('/estantes/{estante}','EstantesController@actualizarEstante');
+Route::put('/estantes/{estante}/posicion','EstantesController@moverEstante');
+Route::delete('/estantes/{estante}','EstantesController@eliminarEstante');
+
+//codigos
+
+Route::get('/codigossinuso','CodigosController@getCodigosSinUso');
+Route::resource('/codigos','CodigosController');
+//codigos ubicados
+Route::get('/codigosubicados','CodigoUbicadoController@getCodigosUbicados');
+Route::post('/codigosubicados','CodigoUbicadoController@agregarCodigoUbicado');
+Route::put('/codigosubicados/{codigo}','CodigoUbicadoController@actualizarCodigoUbicado');
+Route::delete('/codigosubicados/{codigo}','CodigoUbicadoController@eliminarCodigoUbicado');
 //home
 Route::get('/home',['as'=>'home',function()
-{
-  return view('home.home');
-}]);
-//home con post
-Route::post('/home',['as'=>'home',function()
 {
   return view('home.home');
 }]);
@@ -39,22 +40,16 @@ Route::get('/bibliotecaVirtual',['as'=>'bibliotecaVirtual', function()
 {
   return view('home.bibliotecaVirtual');
 }]);
-//Ventana para agregar un codigo
-Route::get('/codigos/agregar',['as'=>'agregarCodigo',function()
+Route::get('/logout',['as'=>'logout','uses'=>'LoginController@logout']);
+
+});
+//////////////////////////////////////////////////////////
+//Ventana principal sin logueo
+Route::get('/principal',['as'=>'principal',function()
 {
-  return view('codigos.agregarCodigo');
+  return view('principal');
 }]);
-//Ventana para agregar un codigo post
-Route::post('/codigos/agregar',['as'=>'agregarCodigo',function()
-{
-  return view('codigos.agregarCodigo');
-}]);
-//Ventana para listar los codigos
-Route::get('/codigos/listar',['as'=>'listarCodigos',function()
-{
-  return view('codigos.listarCodigos');
-}]);
-Route::get('/codigos/editar',['as'=>'editarCodigo',function()
-{
-  return view('codigos.editarCodigo');
-}]);
+//Ventana de registro
+Route::get('/usuarios/create','UsersController@create');
+Route::post('/usuarios/store',['as'=>'crearUsuario','uses'=>'UsersController@store']);
+Route::post('/login','LoginController@login');

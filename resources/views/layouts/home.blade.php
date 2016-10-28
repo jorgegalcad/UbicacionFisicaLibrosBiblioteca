@@ -20,15 +20,15 @@
       <ul class="right hide-on-med-and-down">
         <li><a href="{{route('home')}}" class="waves-effect waves-light  modal-trigger">Home</a></li>
         <li><a href="{{route('bibliotecaVirtual')}}" class="waves-effect waves-light">Biblioteca Virtual</a></li>
-        <li><a href="{{route('agregarCodigo')}}" class="waves-effect waves-light">Códigos QR</a></li>
+        <li><a href="{{route('codigos.index')}}" class="waves-effect waves-light">Códigos QR</a></li>
         <li><a class="dropdown-button perfil" href="#!" data-activates="dropdown1">
-          <img src="{!! asset('images/perfil.png') !!}" alt="" class="circle foto-perfil right"></a></li>
+          <img id="imgP"src="{!! asset('images/perfil.png') !!}" alt="" class="circle foto-perfil right"></a></li>
         </ul>
       </div>
     </nav>
     <!-- Dropdown Structure -->
     <ul id="dropdown1" class="dropdown-content cerrar-sesion">
-      <li><a href="{{route('principal')}}">Cerrar sesión</a></li>
+      <li><a href="{{route('logout')}}">Cerrar sesión</a></li>
     </ul>
 
     <section>
