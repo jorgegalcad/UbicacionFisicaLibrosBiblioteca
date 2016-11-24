@@ -16,8 +16,8 @@ use Illuminate\Http\Request;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
-Route::get('/bibliotecas/codigos/{serial}','CodigosController@getCodigoIdentificacion');
+Route::get('/bibliotecas/codigos/{serial}','CodigosController@getCodigo');
 Route::get('/bibliotecas/{biblioteca}/planos','BibliotecasController@getPlanosBiblioteca');
 Route::get('/bibliotecas/{biblioteca}/planos/{plano}/estantes','EstantesController@getEstantesDesdeBibliotecaYPlano');
 Route::get('/bibliotecas/{biblioteca}/planos/{plano}/codigosubicados','CodigoUbicadoController@getCodigosUbicadoDesdeBibliotecaYPlano');
-Route::get('/bibliotecas/{biblioteca}/codigos/{serial}','CodigosController@getCodigoDesdeBibliotecaYSerial');
+//Route::get('/bibliotecas/{biblioteca}/codigos/{serial}','CodigosController@getCodigoDesdeBibliotecaYSerial');

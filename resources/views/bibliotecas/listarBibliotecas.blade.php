@@ -6,8 +6,8 @@
     <h5 class="titulo-opciones">Opciones</h5>
     <div class="collection ">
 
-      <a href="{{route('codigos.create')}}" class="collection-item indigo-text waves-effect waves-light"><i class="material-icons right">add</i>Agregar Código</a>
-      <a href="{{route('codigos.index')}}" class="collection-item indigo-text waves-effect waves-light"><i class="material-icons right">view_list</i>Listar Códigos</a>
+      <a href="{{route('bibliotecas.create')}}" class="collection-item indigo-text waves-effect waves-light"><i class="material-icons right">add</i>Agregar Bibliotecas</a>
+      <a href="{{route('bibliotecas.index')}}" class="collection-item indigo-text waves-effect waves-light"><i class="material-icons right">view_list</i>Listar Bibliotecas</a>
     </div>
   </div>
   <div class="col s9 div-opciones-codigos">
@@ -27,34 +27,32 @@
   <table class="striped responsive-table"  >
     <thead>
       <tr>
-        <th data-field="serial">Serial</th>
-        <th data-field="asignado">Asignado</th>
-        <th data-field="fecha_regsitro">Descargar</th>
-        <th data-field="ver">Ver</th>
-        <th data-field="editar">Editar</th>
-        <th data-field="ver">Eliminar</th>
+        <th data-field="serial">Nombre</th>
+        <th data-field="contenido">Ver detalles</th>
+        <th data-field="asignado">Ver planos</th>
+        <th data-field="fecha_regsitro">Editar</th>
+        <th data-field="Opciones">Eliminar</th>
       </tr>
     </thead>
 
     <tbody>
-      @foreach($codigos as $codigo)
+      @foreach($bibliotecas as $biblioteca)
       <tr>
-        <td>{!!$codigo->id!!}</td>
-        <td>Si</td>
-        <td><a href="{{route('descargarCodigo',$codigo->id)}}" class="btn-floating btn-large waves-effect
-          waves-light indigo lighten-4"><i class="material-icons">turned_in</i>
-        </a></td>
-        <td><a href="{{route('codigos.show',$codigo->id)}}" class="btn-floating btn-large waves-effect
+        <td>{!!$biblioteca->nombre!!}</td>
+        <td><a href="{{route('bibliotecas.show',$biblioteca->id)}}" class="btn-floating btn-large waves-effect
           waves-light indigo lighten-3"><i class="material-icons">visibility</i>
         </a></td>
-        <td><a href="{{route('codigos.edit',$codigo->id)}}" class="btn-floating btn-large waves-effect
+        <td><a href="{{route('bibliotecaVirtual',$biblioteca->id)}}" class="btn-floating btn-large waves-effect
+          waves-light indigo lighten-2"><i class="material-icons">visibility</i>
+        </a></td>
+        <td> <a href="{{route('bibliotecas.edit',$biblioteca->id)}}" class="btn-floating btn-large waves-effect
           waves-light indigo lighten-1"><i class="material-icons">edit</i>
         </a></td>
         <td>
           <div class="row">
             {!! Form::open([
               'method' => 'DELETE',
-              'route' => ['codigos.destroy', $codigo->id],'class'=>'form-delete'
+              'route' => ['bibliotecas.destroy', $biblioteca->id],'class'=>'form-delete'
               ]) !!}
 
               <button class="btn-floating btn-large waves-effect

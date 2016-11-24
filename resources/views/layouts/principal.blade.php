@@ -21,7 +21,7 @@
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="right hide-on-med-and-down">
         <li><a href="#modalIniciarSesion" class="waves-effect waves-light  modal-trigger">Inicar Sesión</a></li>
-        <li><a href="{{url('/usuarios/create')}}"  class="waves-effect waves-light">Registrarse</a></li>
+        <li><a href="{{url('/usuarios/biblioteca/create')}}"  class="waves-effect waves-light">Registrarse</a></li>
       </ul>
     </div>
   </nav>

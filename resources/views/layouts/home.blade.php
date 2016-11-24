@@ -19,7 +19,7 @@
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="right hide-on-med-and-down">
         <li><a href="{{route('home')}}" class="waves-effect waves-light  modal-trigger">Home</a></li>
-        <li><a href="{{route('bibliotecaVirtual')}}" class="waves-effect waves-light">Biblioteca Virtual</a></li>
+        <li><a href="{{route('bibliotecas.index')}}" class="waves-effect waves-light">Bibliotecas</a></li>
         <li><a href="{{route('codigos.index')}}" class="waves-effect waves-light">Códigos QR</a></li>
         <li><a class="dropdown-button perfil" href="#!" data-activates="dropdown1">
           <img id="imgP"src="{!! asset('images/perfil.png') !!}" alt="" class="circle foto-perfil right"></a></li>

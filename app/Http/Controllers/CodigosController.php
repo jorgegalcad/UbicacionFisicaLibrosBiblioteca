@@ -8,26 +8,15 @@ use App\Http\Requests;
 use DB;
 use App\Biblioteca;
 use App\Codigo;
+use App\Codigoubicado;
+use App\Plano;
 use Session;
 use Auth;
+use File;
+use QrCode;
 class CodigosController extends Controller
 {
-  /**
-  * Obtiene los codigos registrados para una biblioteca que pertenece a un usuario
-  */
-  public function getCodigos()
-  {
-    $idUsuario=Auth::user()->id;
-    $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
-    if($idBiblioteca!=null)
-    {
-      $codigos=DB::table('codigos')->select()->where('id_biblioteca','=',$idBiblioteca->id)->get();
-      return response(['codigos'=>$codigos],200);
-    }
-    else {
-      return response([['No se encontró la biblioteca']],404);
-    }
-  }
+
   /**
   * Obtiene el codigo a partir de la biblioteca y el codigo serial que tiene asociado
   * @param $idBiblioteca  identificador de la biblioteca
@@ -83,148 +72,154 @@ class CodigosController extends Controller
   * Obtiene los codigos del usuario en sesion, que todavia no han sido usados
   *
   */
-  public function getCodigosSinUso()
+  public function getCodigosSinUso($idBiblioteca)
   {
-    $idUsuario=Auth::user()->id;
+    /**$idUsuario=Auth::user()->id;
     $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
     if($idBiblioteca!=null)
+    {*/
+    $idPlanos=DB::table('planos')->select('id')->where('id_biblioteca','=',$idBiblioteca)->get();
+    $idPlanosArray=array();
+    foreach($idPlanos as $idPlano)
     {
-      $idPlanos=DB::table('planos')->select('id')->where('id_biblioteca','=',$idBiblioteca->id)->get();
-      $idPlanosArray=array();
-      foreach($idPlanos as $idPlano)
+      array_push($idPlanosArray,$idPlano->id);
+    }
+    if(count($idPlanosArray)>0)
+    {
+      $codigosUbicados=DB::table('codigoubicados')->select('id_codigo')->whereIn('id_plano',$idPlanosArray)->get();
+      $codigosArray=array();
+      foreach($codigosUbicados as $codigoU)
       {
-        array_push($idPlanosArray,$idPlano->id);
+        array_push($codigosArray,$codigoU->id_codigo);
       }
-      if(count($idPlanosArray)>0)
-      {
-        $codigosUbicados=DB::table('codigoubicados')->select('id_codigo')->whereIn('id_plano',$idPlanosArray)->get();
-        $codigosArray=array();
-        foreach($codigosUbicados as $codigoU)
-        {
-          array_push($codigosArray,$codigoU->id_codigo);
-        }
-        $codigos=DB::table('codigos')->select()->where('id_biblioteca','=',$idBiblioteca->id)->whereNotIn('id',$codigosArray)->get();
-        return response(['planos'=>$idPlanosArray,'codigos'=>$codigos],200);
-      }
-      else {
-        return response(['error'=>'No se encontraron planos'],404);
-      }
+      $codigos=DB::table('codigos')->select()->where('id_biblioteca','=',$idBiblioteca)->whereNotIn('id',$codigosArray)->get();
+      return response(['planos'=>$idPlanosArray,'codigos'=>$codigos],200);
     }
     else {
-      return response(['error'=>"No se encontró la biblioteca"],200);
+      return response(['error'=>'No se encontraron planos'],404);
+    }
+    /**  }
+    else {
+    return response(['error'=>"No se encontró la biblioteca"],200);
+  }*/
+
+}
+/**
+* Obtiene el codigo QR a partir de la lectura
+* @param $id el identificador del codigo
+* @return una respuesta json, con cuatro objetos, un objeto codigo, un objeto biblioteca
+* un objeto plano, y la ubicación del codigo
+*/
+public function getCodigo($id)
+{
+  $codigo=Codigo::find($id);
+  if($codigo!=null)
+  {
+    $codigoUbicado=Codigoubicado::where('id_codigo','=',$codigo->id)->get()->first();
+    if($codigoUbicado!=null)
+    {
+      $plano=Plano::find($codigoUbicado->id_plano);
+      $biblioteca=Biblioteca::find($codigo->id_biblioteca);
+      return response()->json(['codigo'=>$codigo,'biblioteca'=>$biblioteca,'codigoUbicado'=>$codigoUbicado,'plano'=>$plano],200);
+    }
+    else {
+      return response()->json(['Error'=>'El código no esta ubicado'],404);
+
+    }
+  }
+  else {
+    return response()->json(['Error'=>'No se encontró el código'],404);
+  }
+}
+/**
+* Obtiene los codigos del usuario registrado en sesion
+*/
+public function index()
+{
+  $idUsuario=Auth::user()->id;
+  $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
+  if($idBiblioteca!=null)
+  {
+    $codigos=DB::table('codigos')->select()->where('id_biblioteca','=',$idBiblioteca->id)->get();
+    return view('codigos.listarCodigos',['codigos'=>$codigos]);
+  }
+  else {
+    return redirect()->back()->withErrors("No se encontró biblioteca para el usuario");
+  }
+}
+/**
+* Obtiene el formulario para crear
+*/
+public function create()
+{
+  $bibliotecas=Biblioteca::where('id_user','=',Auth::user()->id)->get();
+  return view('codigos.agregarCodigo',['bibliotecas'=>$bibliotecas]);
+}
+/**
+* Crea y Almacena un nuevo codigo
+* @param $request parametros para crear el codigo
+*/
+public function store(Request $request)
+{
+  $this->validate($request, [
+    'contenido' => 'required | string| max:200|min:5',
+    'id_biblioteca'=>'required|integer'
+    ]);
+    $idBiblioteca=$request->get('id_biblioteca');
+
+    $codigo=new Codigo();
+    $codigo->contenido=$request->get('contenido');
+    $codigo->id_biblioteca=$idBiblioteca;
+    $codigo->save();
+    $qrcode=QrCode::format('png');
+    $qrcode->size(800)->generate($codigo->id,public_path('/codigos_qr/'.$codigo->id.'.png'));
+    $codigo->imagen='/codigos_qr/'.$codigo->id.'.png';
+    $codigo->update();
+    Session::flash('flash_message', 'Código registrado');
+    return redirect()->back();
+
+  }
+  public function show($id)
+  {
+    $codigo=Codigo::find($id);
+    if($codigo!=null)
+    {
+      return view('codigos.verCodigo',['codigo'=>$codigo]);
+    }
+    else {
+      return redirect()->back()->withErrors("No se encontró el código");
     }
 
   }
   /**
-  * Obtiene los usos de los codigos
+  * Obtiene la vista para editar el código
   */
-  private function getUsoCodigos()
+  public function edit($id)
   {
-    $usocodigos=DB::table('usocodigos')->select()->get();
-    return $usocodigos;
-  }
-  /**
-  * Obtiene los codigos del usuario registrado en sesion
-  */
-  public function index()
-  {
-    $idUsuario=Auth::user()->id;
-    $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
-    if($idBiblioteca!=null)
+    $codigo=Codigo::find($id);
+    if($codigo!=null)
     {
-      $codigos=DB::table('codigos')->select()->where('id_biblioteca','=',$idBiblioteca->id)->get();
-      return view('codigos.listarCodigos',['codigos'=>$codigos]);
+      $usocodigos=DB::table('usocodigos')->select()->get();
+      return view('codigos.editarCodigo',['codigo'=>$codigo,'usocodigos'=>$usocodigos]);
     }
     else {
-      return redirect()->back()->withErrors("No se encontró biblioteca para el usuario");
+      return redirect()->back()->withErrors("No se encontró el código");
     }
   }
   /**
-  * Obtiene el formulario para crear
+  * Actualiza un codigo en la base de datos
+  * @param $request  parametros para actualizar el codigo
+  * @param $id   el identificador del codigo
   */
-  public function create()
-  {
-    $usocodigos=DB::table('usocodigos')->select()->get();
-    return view('codigos.agregarCodigo',['usocodigos'=>$usocodigos]);
-  }
-  /**
-  * Crea y Almacena un nuevo codigo
-  * @param $request parametros para crear el codigo
-  */
-  public function store(Request $request)
+  public function update(Request $request,$id)
   {
     $this->validate($request, [
-      'serial_identificador'        => 'required | string| max:20|min:5',
       'contenido' => 'required | string| max:200|min:5',
-      'id_usocodigo'=>'required | integer'
       ]);
-      $idUsuario=Auth::user()->id;
-      $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
-      if($idBiblioteca!=null)
-      {
-        $eval=$this->esAptoSerial($request,$idBiblioteca->id);
-        if($eval!=null)
-        {
-          return $eval;
-        }
-        $codigo=new Codigo();
-        $codigo->serial_identificador=$request->get('serial_identificador');
-        $codigo->contenido=$request->get('contenido');
-        $codigo->id_usocodigo=$request->get('id_usocodigo');
-        $codigo->id_biblioteca=$idBiblioteca->id;
-        $codigo->save();
-        Session::flash('flash_message', 'Código registrado');
-        return redirect()->back();
-      }
-      else {
-        return redirect()->back()->withErrors("EL usuario no tiene biblioteca asociada");
-      }
-
-    }
-    public function show($id)
-    {
-      return redirect()->back();
-    }
-    /**
-    * Obtiene la vista para editar el código
-    */
-    public function edit($id)
-    {
       $codigo=Codigo::find($id);
       if($codigo!=null)
       {
-        $usocodigos=DB::table('usocodigos')->select()->get();
-        return view('codigos.editarCodigo',['codigo'=>$codigo,'usocodigos'=>$usocodigos]);
-      }
-      else {
-        return redirect()->back()->withErrors("No se encontró el código");
-      }
-    }
-    /**
-    * Actualiza un codigo en la base de datos
-    * @param $request  parametros para actualizar el codigo
-    * @param $id   el identificador del codigo
-    */
-    public function update(Request $request,$id)
-    {
-      $this->validate($request, [
-        'serial_identificador'        => 'required | string| max:20|min:5',
-        'contenido' => 'required | string| max:200|min:5',
-        'id_usocodigo'=>'required | integer'
-        ]);
-      $codigo=Codigo::find($id);
-      if($codigo!=null)
-      {
-        if($codigo->serial_identificador!=$request->get('serial_identificador') || $codigo->id_usocodigo!=$request->get('id_usocodigo'))
-        {
-          $eval=$this->esAptoSerial($request,$codigo->id_biblioteca);
-          if($eval!=null)
-          {
-            return $eval;
-          }
-        }
         $data=$request->all();
-        var_dump($data);
         $codigo->update($data);
         Session::flash('flash_message', 'Código actualizado');
         return redirect()->back();
@@ -232,30 +227,6 @@ class CodigosController extends Controller
       else {
         return redirect()->back()->withErrors("El código no existe");
       }
-    }
-    /**
-    * determina si el serial que se quiere asignar con uncodigo no posee
-    * conflictos
-    */
-    private function esAptoSerial(Request $request,$idBiblioteca)
-    {
-      if($request->get('id_usocodigo')==2)
-      {
-        $codigos=DB::table('codigos')->select('serial_identificador')->where([['serial_identificador',
-        '=',$request->get('serial_identificador')],['id_biblioteca','=',$idBiblioteca]])->first();
-        if($codigos!=null)
-        {
-          return redirect()->back()->withErrors("El serial para el codigo ya se encuentra registrado");
-        }
-      }
-      else {
-        $codigos=DB::table('codigos')->select('serial_identificador')->where([['serial_identificador','=',$request->get('serial_identificador')],['id_usocodigo','=',1]])->first();
-        if($codigos!=null)
-        {
-          return redirect()->back()->withErrors("El serial para identificar la biblioteca, ya se encuentra asignado");
-        }
-      }
-      return null;
     }
     /**
     * Elimina un código
@@ -266,6 +237,7 @@ class CodigosController extends Controller
       $codigo=Codigo::find($id);
       if($codigo!=null)
       {
+        File::delete(public_path().$codigo->imagen);
         $codigo->delete();
         Session::flash('flash_message', 'Código eliminado');
         return redirect()->back();

@@ -19,7 +19,7 @@ class CreateBibliotecasTable extends Migration
       $table->string('pais','20');
       $table->string('departamento','20');
       $table->string('municipio','20');
-      $table->string('direccion','30');
+      $table->string('direccion','100');      
       $table->integer('id_user')->unsigned()->nullable();
       $table->timestamps();
       $table->foreign('id_user')

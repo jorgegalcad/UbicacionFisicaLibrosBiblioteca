@@ -43,10 +43,12 @@ var url;
 //imagen QR
 var img
 var codigosQR=[];
-var $selectDropdown;
+var selectDropdown;
 var idPlanos=[];
+var idBiblioteca;
 $(document).ready(function()
 {
+	idBiblioteca=$('#id_biblioteca').val();
 	ancho=$('#div-plano').width();
 	alto=$('#row').height();
 	offset=$('#div-plano').offset();
@@ -57,13 +59,12 @@ $(document).ready(function()
 		map:new THREE.ImageUtils.loadTexture(url+"/js/qr.png")
 	});
 	$('select').material_select();
-	$selectDropdown =
-	$("#usoS")
-	.empty()
-	.html(' ');
+	selectDropdown =$("#usoS");
+	selectDropdown.empty()
+	selectDropdown.html(' ');
 
 
-	$selectDropdown.trigger('contentChanged');
+	selectDropdown.trigger('contentChanged');
 	//img.map.needsUpdate = true; //ADDED
 	init();
 	obtenerEstantes();
@@ -632,7 +633,7 @@ function obtenerEstantes()
 	});
 	$.ajax(
 		{
-			url: "/estantes",
+			url: "/bibliotecas/"+idBiblioteca+"/estantes",
 			type:'GET',
 
 			success:function(response)
@@ -647,6 +648,7 @@ function obtenerEstantes()
 			error:function(error)
 			{
 				$('#div-plano').loading('stop');
+				console.log(error);
 				$.notify("Ocurrio un error cargando los elementos",{position:"right middle",className:"error"});
 			}
 		}
@@ -898,7 +900,7 @@ function obtenerCodigos()
 	});
 	$.ajax(
 		{
-			url: "/codigosubicados",
+			url: "/bibliotecas/"+idBiblioteca+"/codigosubicados",
 			type:'GET',
 
 			success:function(response)
@@ -913,7 +915,7 @@ function obtenerCodigos()
 			error:function(error)
 			{
 				$('#div-plano').loading('stop');
-				$.notify("Ocurrio un error cargando los elementos",{position:"right middle",className:"error"});
+				//$.notify("Ocurrio un error cargando los elementos",{position:"right middle",className:"error"});
 			}
 		}
 	);
@@ -1093,19 +1095,21 @@ function getCodigosQRSinUso()
 {
 	$.ajax(
 		{
-			url: "/codigossinuso",
+			url: "/bibliotecas/"+idBiblioteca+"/codigossinuso",
 			type:'GET',
 
 			success:function(response)
 			{
+				console.log(response);
 				codigosQR=response.codigos;
 				idPlanos=response.planos;
 				var option;
-				$selectDropdown.empty().html(' ');
+				selectDropdown.empty().html(' ');
 				for(i=0;i<codigosQR.length;i++)
 				{
-					option=$('<option/>',{'value':codigosQR[0].id,'text':codigosQR[0].serial_identificador});
-					$selectDropdown.append(option);
+					console.log("Holaa");
+					option=$('<option/>',{'value':codigosQR[i].id,'text':codigosQR[i].id});
+					selectDropdown.append(option);
 				}
 				$('select').material_select();
 			},

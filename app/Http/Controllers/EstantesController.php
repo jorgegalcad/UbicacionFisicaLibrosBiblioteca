@@ -15,13 +15,13 @@ class EstantesController extends Controller
   * Obtiene todos los estantes de la biblioteca del usuario en sesion
   *
   */
-  public function getEstantes()
+  public function getEstantes($idBiblioteca)
   {
-    $idUsuario=Auth::user()->id;
+    /**$idUsuario=Auth::user()->id;
     $idBiblioteca=DB::table('bibliotecas')->select('id')->where('id_user','=',$idUsuario)->get()->first();
     if($idBiblioteca!=null)
-    {
-      $idPlano=DB::table('planos')->select('id')->where('id_biblioteca','=',$idBiblioteca->id)->get()->first();
+    {*/
+      $idPlano=DB::table('planos')->select('id')->where('id_biblioteca','=',$idBiblioteca)->get()->first();
       if($idPlano!=null)
       {
         $estantes=DB::table('estantes')->select()->where('id_plano','=',$idPlano->id)->get();
@@ -30,10 +30,10 @@ class EstantesController extends Controller
       else {
         return response([['No se encontró el plano de la biblioteca']],404);
       }
-    }
+  /**  }
     else {
       return response([['No se encontró la biblioteca']],404);
-    }
+    }*/
 
   }
   /**

@@ -28,20 +28,15 @@
     <br>
     {!! Form::open(array('route' => 'codigos.store','method'=>'post')) !!}
     <div class="row input-field">
-      <i class="material-icons prefix">code_qr</i>
-      {!! Form::label('serial_identificador', 'Serial', ['class' => 'validate']) !!}
-      {!! Form::text('serial_identificador', null, ['class' => 'validate']) !!}
-    </div>
-    <div class="row input-field">
       <i class="material-icons prefix">chat_bubble_outline</i>
       {!! Form::label('contenido', 'Contenido', ['class' => 'validate']) !!}
       {!! Form::textarea('contenido',null,['class'=>'materialize-textarea validate']) !!}
     </div>
     <div class="row input-field">
       <i class="material-icons prefix">settings</i>
-      <select name="id_usocodigo" id="id_usocodigo">
-        @foreach($usocodigos as $uso)
-        <option value="{!!$uso->id!!}">{!!$uso->nombre!!}</option>
+      <select name="id_biblioteca" id="id_biblioteca">
+        @foreach($bibliotecas as $biblioteca)
+        <option value="{!!$biblioteca->id!!}">{!!$biblioteca->nombre!!}</option>
         @endforeach
       </select>
 
